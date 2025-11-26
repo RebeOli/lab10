@@ -137,11 +137,13 @@ public final class LambdaUtilities {
      */
     public static <K, V> Map<K, V> fill(final Map<K, Optional<V>> map, final Supplier<V> def) {
         /*
-         * Suggestion: consider Optional.orElse
+         * Suggestion: consider Optional.orElse (se esiste l'optional, prende quello, altrimenti se è vuoto, prende un valore di default)
          *
          * Keep in mind that a map can be iterated through its forEach method
          */
-        return emptyMap();
+        final Map<K, V> resultMap = new HashMap<>();
+        map.forEach((k, opt) -> resultMap.put(k,(opt).orElse(def.get()))); //itero su ogni coppia chiave-valore
+        return resultMap;
     }
 
     /**
