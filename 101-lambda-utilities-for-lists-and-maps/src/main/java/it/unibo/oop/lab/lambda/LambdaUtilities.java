@@ -8,16 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 /**
  * This class will contain four utility functions on lists and maps, of which the first one is provided as example.
@@ -68,8 +64,7 @@ public final class LambdaUtilities {
          * Suggestion: consider Optional.filter
          */
         final List<Optional<T>> listOptional = new ArrayList<>(list.size() * 2);
-        
-        list.forEach(t-> {
+        list.forEach(t -> {
             final Optional<T> opt = Optional.of(t);
             listOptional.add(opt.filter(pre));
             /*if(pre.test(t)){ 
@@ -104,9 +99,9 @@ public final class LambdaUtilities {
                 op.apply(t), //chiave, se c'è già non viene aggiunta
                 new HashSet<>(Set.of(t)), //valore da aggiungere
                 LambdaUtilities::union
-                /*(oldSet, newSet) -> {
-                    oldSet.addAll(newSet);
-                    return oldSet;
+            /*(oldSet, newSet) -> {
+            oldSet.addAll(newSet);
+            return oldSet;
             }*/
             );
         });
@@ -118,7 +113,8 @@ public final class LambdaUtilities {
      * @param set2 set2
      * @return union
      */
-    public static <T> Set<T> union(final Set<? extends T> set1, final Set<? extends T> set2){
+
+    public static <T> Set<T> union(final Set<? extends T> set1, final Set<? extends T> set2) {
         final Set<T> unionSet = new LinkedHashSet<>(set1);
         unionSet.addAll(set2);
         return unionSet;
@@ -135,14 +131,16 @@ public final class LambdaUtilities {
      * @return a map whose non-present values are filled with the value provided
      *         by the supplier
      */
+
     public static <K, V> Map<K, V> fill(final Map<K, Optional<V>> map, final Supplier<V> def) {
         /*
-         * Suggestion: consider Optional.orElse (se esiste l'optional, prende quello, altrimenti se è vuoto, prende un valore di default)
+         * Suggestion: consider Optional.orElse 
+         *(se esiste l'optional, prende quello, altrimenti se è vuoto, prende un valore di default)
          *
          * Keep in mind that a map can be iterated through its forEach method
          */
         final Map<K, V> resultMap = new HashMap<>();
-        map.forEach((k, opt) -> resultMap.put(k,(opt).orElse(def.get()))); //itero su ogni coppia chiave-valore
+        map.forEach((k, opt) -> resultMap.put(k, opt.orElse(def.get()))); //itero su ogni coppia chiave-valore
         return resultMap;
     }
 
