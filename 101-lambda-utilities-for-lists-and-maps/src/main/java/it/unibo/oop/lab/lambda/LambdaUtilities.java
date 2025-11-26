@@ -2,10 +2,13 @@ package it.unibo.oop.lab.lambda;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -93,11 +96,33 @@ public final class LambdaUtilities {
     public static <R, T> Map<R, Set<T>> group(final List<T> list, final Function<T, R> op) {
         /*
          * Suggestion: consider Map.merge
+         * R = chiave, Set<T> = valore
          */
-        
-        return emptyMap();
+        final Map<R, Set<T>> map = new HashMap<>();
+        list.forEach(t -> {
+            map.merge(
+                op.apply(t), //chiave, se c'è già non viene aggiunta
+                new HashSet<>(Set.of(t)), //valore da aggiungere
+                LambdaUtilities::union
+                /*(oldSet, newSet) -> {
+                    oldSet.addAll(newSet);
+                    return oldSet;
+            }*/
+            );
+        });
+        return map;
     }
-
+    /**
+     * @param <T> elem
+     * @param set1 set1
+     * @param set2 set2
+     * @return union
+     */
+    public static <T> Set<T> union(final Set<? extends T> set1, final Set<? extends T> set2){
+        final Set<T> unionSet = new LinkedHashSet<>(set1);
+        unionSet.addAll(set2);
+        return unionSet;
+    }
     /**
      * @param map
      *            input map
