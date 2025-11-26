@@ -1,5 +1,10 @@
 package it.unibo.mvc;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Encapsulates the concept of configuration.
@@ -66,11 +71,37 @@ public final class Configuration {
         private static final int MIN = 0;
         private static final int MAX = 100;
         private static final int ATTEMPTS = 10;
-
         private int min = MIN;
         private int max = MAX;
         private int attempts = ATTEMPTS;
         private boolean consumed = false;
+
+        public Builder(){
+            try(final InputStream in = getClass().getClassLoader().getResourceAsStream("config.yml")){
+                if( in == null){
+                    throw new IllegalStateException("config.yml not found");
+                }
+                final BufferedReader r = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while((line = r.readLine())!=null){
+                    line=line.trim();
+                    final String[] arrayString = line.split(":");
+                    if(arrayString.length == 2){
+                        String key = arrayString[0].trim();
+                        String value = arrayString[1].trim();
+                        if(key.equals("minimum")){
+                            min = Integer.parseInt(value);
+                        } else if(key.equals("maximum")){
+                            max = Integer.parseInt(value);
+                        } else if (key.equals("attempts")) {
+                            attempts = Integer.parseInt(value);
+                        }
+                    }
+                }
+            } catch (IOException e){
+                throw new IllegalStateException("Unable to load config.yml", e);
+            }
+        }
 
         /**
          * @param min the minimum value
