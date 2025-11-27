@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
@@ -32,7 +33,7 @@ public final class MusicGroupImpl implements MusicGroup {
 
     @Override
     public Stream<String> orderedSongNames() {
-        return songs.stream().map(s -> s.getSongName()).sorted();
+        return songs.stream().map(Song :: getSongName).sorted();
     }
 
     @Override
@@ -44,7 +45,7 @@ public final class MusicGroupImpl implements MusicGroup {
     public Stream<String> albumInYear(final int year) {
         return albums.entrySet().stream()
             .filter(a -> a.getValue().equals(year))
-            .map(a -> a.getKey());
+            .map(Entry :: getKey);
     }
 
     @Override
@@ -57,17 +58,16 @@ public final class MusicGroupImpl implements MusicGroup {
     @Override
     public int countSongsInNoAlbum() {
         return (int) songs.stream()
-            .filter(s -> s.getAlbumName().equals((null)))
+            .filter(s -> s.getAlbumName().isEmpty())
             .count();
     }
 
     @Override
     public OptionalDouble averageDurationOfSongs(final String albumName) {
-
-        return OptionalDouble.of((songs.stream()
+        return OptionalDouble.of(songs.stream()
             .filter(s -> s.getAlbumName().equals(Optional.of(albumName)))
-            .mapToDouble(s -> s.getDuration())
-            .sum())/this.countSongs(albumName));
+            .mapToDouble(Song :: getDuration)
+            .sum() / this.countSongs(albumName));
     }
 
     @Override
@@ -79,9 +79,11 @@ public final class MusicGroupImpl implements MusicGroup {
 
     @Override
     public Optional<String> longestAlbum() {
-        return albums.entrySet().stream()
-            .map(e -> e.getKey())
-            .max(Comparator.comparingInt(a -> countSongs(a)));
+        return albums.keySet().stream()
+            .max(Comparator.comparingDouble(a -> songs.stream()
+                                                .filter(s -> s.getAlbumName().equals(Optional.of(a)))
+                                                .mapToDouble(Song :: getDuration)
+                                                .sum()));
     }
 
     private static final class Song {
