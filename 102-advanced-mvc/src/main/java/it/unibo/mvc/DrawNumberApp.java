@@ -27,7 +27,21 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
             view.setObserver(this);
             view.start();
         }
-        this.model = new DrawNumberImpl(MIN, MAX, ATTEMPTS);
+        DrawNumber tmpModel;
+        try {
+            final ConfigurationFile config = new ConfigurationFile();
+            tmpModel = new DrawNumberImpl(
+                config.getMin(),
+                config.getMax(),
+                config.getAttempts()
+            );
+        } catch (IllegalStateException e) {
+            for (final DrawNumberView view : this.views) {
+                view.displayError(e.getMessage());
+            }
+            tmpModel = new DrawNumberImpl(MIN, MAX, ATTEMPTS);
+        }
+        this.model = tmpModel;
     }
 
     @Override
